@@ -2,7 +2,6 @@
 import numpy as np
 import random
 
-
 def get_initial_loss(vocab_size, seq_length):
     return -np.log(1.0/vocab_size)*seq_length
 
@@ -34,6 +33,7 @@ def update_parameters(parameters, gradients, lr):
     parameters['Wya'] += -lr * gradients['dWya']
     parameters['ba'] += -lr * gradients['db']
     parameters['by'] += -lr * gradients['dby']
+    
     return parameters
 
 def rnn_cell_forward(xt, a_prev, parameters):
@@ -65,7 +65,6 @@ def rnn_forward(X, Y, a0, parameters, vocab_size=27):
     return loss, cache
 
 def rnn_cell_backward(dy, gradients, parameters, x, a, a_prev):
-
     gradients['dWya'] += np.dot(dy, a.T)
     gradients['dby'] += dy
     da = np.dot(parameters['Wya'].T, dy) +         gradients['da_next']  # backprop into h
@@ -79,12 +78,9 @@ def rnn_cell_backward(dy, gradients, parameters, x, a, a_prev):
 
 def rnn_backward(X, Y, parameters, cache):
     gradients = {}
-
     (y_hat, a, x) = cache
     Waa, Wax, Wya, by, ba = parameters['Waa'], parameters['Wax'], parameters['Wya'], parameters['by'], parameters['ba']
-
-    gradients['dWax'], gradients['dWaa'], gradients['dWya'] = np.zeros_like(
-        Wax), np.zeros_like(Waa), np.zeros_like(Wya)
+    gradients['dWax'], gradients['dWaa'], gradients['dWya'] = np.zeros_like(Wax), np.zeros_like(Waa), np.zeros_like(Wya)
     gradients['db'], gradients['dby'] = np.zeros_like(ba), np.zeros_like(by)
     gradients['da_next'] = np.zeros_like(a[0])
 
@@ -103,7 +99,6 @@ def softmax(x):
 
 
 def clip(gradients, maxValue):
-    
     dWaa, dWax, dWya, db, dby = gradients['dWaa'], gradients['dWax'], gradients['dWya'], gradients['db'], gradients['dby']
    
     for gradient in [dWax, dWaa, dWya, db, dby]:
@@ -117,11 +112,9 @@ def clip(gradients, maxValue):
 def sample(parameters, char_to_ix, seed):
     Waa, Wax, Wya, by, ba = parameters['Waa'], parameters['Wax'], parameters['Wya'], parameters['by'], parameters['ba']
     vocab_size = by.shape[0]
-    n_a = Waa.shape[1]
-    
+    n_a = Waa.shape[1]    
     x = np.zeros((vocab_size, 1))
     a_prev = np.zeros((n_a, 1))
-    
     indices = []
     
     idx = -1 
@@ -130,7 +123,6 @@ def sample(parameters, char_to_ix, seed):
     newline_character = char_to_ix['\n']
     
     while (idx != newline_character and counter != 50):
-        
         a = np.tanh(np.dot(Wax, x) + np.dot(Waa, a_prev) + ba)
         z = np.dot(Wya, a) + by
         y = softmax(z)
@@ -218,5 +210,5 @@ print('There are %d total characters and %d unique characters in your data.' % (
 char_to_ix = { ch:i for i,ch in enumerate(sorted(chars)) }
 ix_to_char = { i:ch for i,ch in enumerate(sorted(chars)) }
 
-parameters = model(data, ix_to_char, char_to_ix)
+model(data, ix_to_char, char_to_ix)
 
