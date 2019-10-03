@@ -1,1 +1,1 @@
-"# rnn_char_modelling" 
+# Character level modelling using basic RNN and Numpy
